@@ -21,16 +21,27 @@ var modal = document.getElementById("modelContent");
 var infobtn = document.getElementById("infoButton");
 var infomodalBG = document.getElementById("infoModal");
 var infomodal = document.getElementById("infoModalContent");
+var climodal = document.getElementById("CLImodalContent");
+var climodalBG = document.getElementById("CLImodal");
 var span = document.getElementsByClassName("modalClose")[0];
 var infospan = document.getElementById("infoModalClose");
 
-document.getElementById("cliButton").onclick = () => {modalAppear("There's also a CLI tool for lumen!\n Check it out here!",false,"20%","10%")};
+document.getElementById("cliButton").onclick = CLImodalAppear;
 document.getElementById("notaHiddenButton").onclick = () => {modalAppear("Hey! You're not supposed to find this!\n Why did you click here anyways?",false,"20%","10%")};
 infobtn.onclick = infoModalAppear;
 span.onclick = modalDissapear;
 modalBG.onclick = modalDissapear;
 infospan.onclick = infoModalDissapear;
 infomodalBG.onclick = infoModalDissapear;
+document.getElementById("CLImodalClose").onclick = cliModalDissapear;
+climodalBG.onclick = cliModalDissapear;
+
+function CLImodalAppear() {
+    climodalBG.style.display = "block";
+    climodal.style.transform = "translate(0px, 0px)";
+    climodal.style.width = "20%";
+    climodal.style.height = "10%";
+}
 
 function modalAppear(text,center,width,height) {
     modalBG.style.display = "none";
