@@ -263,6 +263,7 @@ body {
   transform: translate(0px, -1000px);
   animation: modal-appear 0.65s;
   border-radius: 20px;
+  line-height: 20px;
 }
 
 .modal {
@@ -391,6 +392,7 @@ div label {
   .discordSocial {
     background: url(https://cdn.icon-icons.com/icons2/1476/PNG/512/discord_101785.png) center center;
     background-size: 75px;
+    top: -15px;
     width: 75px;
     height: 75px;
     position: relative;
@@ -403,7 +405,7 @@ div label {
     opacity: 0;
   }
   .discordSocialTag{
-    top: -72px;
+    top: -87px;
     opacity: 0;
     background-color: #8C9EFF;
     margin: auto;

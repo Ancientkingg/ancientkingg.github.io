@@ -26,6 +26,9 @@ var climodalBG = document.getElementById("CLImodal");
 var span = document.getElementsByClassName("modalClose")[0];
 var infospan = document.getElementById("infoModalClose");
 
+var atlasmodal = document.getElementById("atlasmodalContent");
+var atlasmodalBG = document.getElementById("atlasmodal");
+
 document.getElementById("cliButton").onclick = CLImodalAppear;
 document.getElementById("notaHiddenButton").onclick = () => {modalAppear("Hey! You're not supposed to find this!\n Why did you click here anyways?",false,"20%","10%")};
 infobtn.onclick = infoModalAppear;
@@ -35,6 +38,28 @@ infospan.onclick = infoModalDissapear;
 infomodalBG.onclick = infoModalDissapear;
 document.getElementById("CLImodalClose").onclick = cliModalDissapear;
 climodalBG.onclick = cliModalDissapear;
+document.getElementById("howToUse").onclick = () => {modalAppear("First save the atlas you want to use as a picture. Secondly you want to colour in the pixels you want to be emissive, with the colour rgba(255,255,127,255) or #ffff7f in hex. Make sure to save it after editing and upload it to the website")}
+document.getElementById("atlasbutton").onclick = atlasmodalAppear;
+document.getElementById("atlasmodalClose").onclick = atlasmodalDissapear;
+document.getElementById("atlasmodal").onclick = atlasmodalDissapear;
+
+function atlasmodalAppear() {
+    atlasmodalBG.style.display = "block";
+    atlasmodal.style.transform = "translate(0px, 0px)";
+    atlasmodal.style.width = "40%";
+    atlasmodal.style.height = "50%";
+}
+
+function atlasmodalDissapear() {
+    atlasmodal.classList.add("modal-dissapear");
+    atlasmodalBG.classList.add("modalbg-dissapear");
+    setTimeout(() => {
+        atlasmodalBG.style.display = "none";
+        atlasmodalBG.classList.remove("modalbg-dissapear");
+        atlasmodal.classList.remove("modal-dissapear");
+    }, 650);
+}
+
 
 function CLImodalAppear() {
     climodalBG.style.display = "block";
