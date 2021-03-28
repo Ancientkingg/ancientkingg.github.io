@@ -147,19 +147,19 @@ function handleImage(e) {
             Strips = column(Strips);
             for (let i = 0; i < Strips.x.length; i++) {
                 if (Array.isArray(Strips.x[i]) && Array.isArray(Strips.y[i])) {
-                    content += `if (x >= ${Strips.x[i][0]} && x <= ${Strips.x[i][1]} && y >= ${Strips.y[i][0]} && y <= ${Strips.y[i][1]}  ) vtc = vec4(1.0,1.0,1.0,1.0); `;
+                    content += `if (x >= ${Strips.x[i][0]} && x <= ${Strips.x[i][1]} && y >= ${Strips.y[i][0]} && y <= ${Strips.y[i][1]}  ) flag = true `;
                 } else if (Array.isArray(Strips.x[i]) && !Array.isArray(Strips.y[i])) {
-                    content += `if (x >= ${Strips.x[i][0]} && x <= ${Strips.x[i][1]} && y == ${Strips.y[i]} ) vtc = vec4(1.0,1.0,1.0,1.0); `;
+                    content += `if (x >= ${Strips.x[i][0]} && x <= ${Strips.x[i][1]} && y == ${Strips.y[i]} ) flag = true `;
                 } else if (!Array.isArray(Strips.x[i]) && Array.isArray(Strips.y[i])) {
-                    content += `if ( x == ${Strips.x[i]} && y >= ${Strips.y[i][0]} && y <= ${Strips.y[i][1]} ) vtc = vec4(1.0,1.0,1.0,1.0); `;
+                    content += `if ( x == ${Strips.x[i]} && y >= ${Strips.y[i][0]} && y <= ${Strips.y[i][1]} ) flag = true `;
                 } else {
-                    content += `if ( x == ${Strips.x[i]} && y == ${Strips.y[i]} ) vtc = vec4(1.0,1.0,1.0,1.0); `;
+                    content += `if ( x == ${Strips.x[i]} && y == ${Strips.y[i]} ) flag = true `;
                 }
             }
             var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
             zipButton.addEventListener("click", saveZip, false);
             zipButton.style.display = "flex";
-            var fsh = `#version 150\n#moj_import <fog.glsl>\n  \n  \nuniform sampler2D Sampler0;\nuniform vec4 ColorModulator;\nuniform float FogStart;\nuniform float FogEnd;\nuniform vec4 FogColor;\n\nin float vertexDistance;\nin vec4 vertexColor;\nin vec2 texCoord0;\nin vec4 normal;\nout vec4 fragColor;\n\nvoid main() \n  {\n  int x = int(texCoord0.x * ${imgData.width});\n  int y = int(texCoord0.y * ${imgData.height});\n  vec4 vtc = vertexColor;\n  \n  ${content}\n\n  vec4 color = texture(Sampler0, texCoord0) * vtc * ColorModulator;\n  fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);\n  }`;
+            var fsh = `#version 150\n#moj_import <fog.glsl>\n  \n  \nuniform sampler2D Sampler0;\nuniform vec4 ColorModulator;\nuniform float FogStart;\nuniform float FogEnd;\nuniform vec4 FogColor;\n\nin float vertexDistance;\nin vec4 vertexColor;\nin vec2 texCoord0;\nin vec4 normal;\nout vec4 fragColor;\n\nvoid main() \n  {\n  	int x = int(texCoord0.x * ${imgData.width});\n  	int y = int(texCoord0.y * ${imgData.height});\n  	bool flag = false;\n  	// block selection. If flag is true then the pixel will be affected\n  	${content} \n\n  	if(flag){\n      vtc = vec4(1.0,1.0,1.0,1.0);\n      vec4 color = texture(Sampler0, texCoord0) * vtc * ColorModulator;\n      fragColor = color;\n    } else {\n      vec4 color = texture(Sampler0, texCoord0) * vertexColor * ColorModulator;\n      fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);\n    }\n  }`;
             cm.setValue(fsh);
             imgLoaded = true;
         }
@@ -175,11 +175,10 @@ document.querySelectorAll('input[name="shaderType"]').forEach((elem) => {
         let question2 = document.getElementById("question2");
         if (imgLoaded == true) {
             if (item == "rendertype_solid") {
-                fsh = `#version 150\n#moj_import <fog.glsl>\n  \n  \nuniform sampler2D Sampler0;\nuniform vec4 ColorModulator;\nuniform float FogStart;\nuniform float FogEnd;\nuniform vec4 FogColor;\n\nin float vertexDistance;\nin vec4 vertexColor;\nin vec2 texCoord0;\nin vec4 normal;\nout vec4 fragColor;\n\nvoid main() \n  {\n  int x = int(texCoord0.x * ${imgData.width});\n  int y = int(texCoord0.y * ${imgData.height});\n  vec4 vtc = vertexColor;\n  \n  ${content}\n\n  vec4 color = texture(Sampler0, texCoord0) * vtc * ColorModulator;\n  fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);\n  }`;
+                fsh = `#version 150\n#moj_import <fog.glsl>\n  \n  \nuniform sampler2D Sampler0;\nuniform vec4 ColorModulator;\nuniform float FogStart;\nuniform float FogEnd;\nuniform vec4 FogColor;\n\nin float vertexDistance;\nin vec4 vertexColor;\nin vec2 texCoord0;\nin vec4 normal;\nout vec4 fragColor;\n\nvoid main() \n  {\n  	int x = int(texCoord0.x * ${imgData.width});\n  	int y = int(texCoord0.y * ${imgData.height});\n  	bool flag = false;\n  	// block selection. If flag is true then the pixel will be affected\n  	${content} \n\n  	if(flag){\n      vtc = vec4(1.0,1.0,1.0,1.0);\n      vec4 color = texture(Sampler0, texCoord0) * vtc * ColorModulator;\n      fragColor = color;\n    } else {\n      vec4 color = texture(Sampler0, texCoord0) * vertexColor * ColorModulator;\n      fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);\n    }\n  }`;
                 cm.setValue(fsh);
             } else if (item == "rendertype_entity_cutout") {
-                content = content.split("vtc = vec4(1.0,1.0,1.0,1.0);").join("flag = true;");
-                fsh = `#version 150\n#moj_import <fog.glsl>\n\n  \nuniform sampler2D Sampler0;\nuniform vec4 ColorModulator;\nuniform float FogStart;\nuniform float FogEnd;\nuniform vec4 FogColor;\n\nin float vertexDistance;\nin vec4 vertexColor;\nin vec4 lightMapColor;\nin vec4 overlayColor;\nin vec2 texCoord0;\nin vec4 normal;\n\nout vec4 fragColor;\nvoid main()\n{\n  int x = int(texCoord0.x * ${imgData.width});\n  int y = int(texCoord0.y * ${imgData.height});\n  vec4 color = texture(Sampler0, texCoord0);\n  vec4 vtc = vertexColor;\n  bool flag = false;\n  ${content}\n  if (flag) {\n    vtc = vec4(1.0,1.0,1.0,1.0);\n    color *= vtc * ColorModulator; \n    if (color.a < 0.1)\n    {\n      discard;\n    }\n    color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a); \n    fragColor = color, vertexDistance, FogStart, FogEnd, FogColor;\n  } else {\n    color *= vtc * ColorModulator;\n    if (color.a < 0.1) {\n      discard;\n    }\n    color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);\n    color *= lightMapColor;\n    fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);\n  }\n}`
+                fsh = `#version 150\n#moj_import <fog.glsl>\n\n  \nuniform sampler2D Sampler0;\nuniform vec4 ColorModulator;\nuniform float FogStart;\nuniform float FogEnd;\nuniform vec4 FogColor;\n\nin float vertexDistance;\nin vec4 vertexColor;\nin vec4 lightMapColor;\nin vec4 overlayColor;\nin vec2 texCoord0;\nin vec4 normal;\n\nout vec4 fragColor;\nvoid main()\n  {\n    int x = int(texCoord0.x * ${imgData.width});\n    int y = int(texCoord0.y * ${imgData.height});\n    vec4 color = texture(Sampler0, texCoord0);\n    bool flag = false;\n    ${content}\n\n    if (flag) {\n      vtc = vec4(1.0,1.0,1.0,1.0);\n      color *= vtc * ColorModulator; \n      if (color.a < 0.1)\n      {\n        discard;\n      }\n      color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a); \n      fragColor = color, vertexDistance, FogStart, FogEnd, FogColor;\n    } else {\n      color *= vertexColor * ColorModulator;\n      if (color.a < 0.1) {\n        discard;\n      }\n      color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);\n      color *= lightMapColor;\n      fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);\n    }\n  }`
                 cm.setValue(fsh);
             }
         } else {
