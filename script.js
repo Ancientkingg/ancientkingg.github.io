@@ -149,11 +149,11 @@ function handleImage(e) {
                 if (Array.isArray(Strips.x[i]) && Array.isArray(Strips.y[i])) {
                     content += `if (x >= ${Strips.x[i][0]} && x <= ${Strips.x[i][1]} && y >= ${Strips.y[i][0]} && y <= ${Strips.y[i][1]}  ) flag = true `;
                 } else if (Array.isArray(Strips.x[i]) && !Array.isArray(Strips.y[i])) {
-                    content += `if (x >= ${Strips.x[i][0]} && x <= ${Strips.x[i][1]} && y == ${Strips.y[i]} ) flag = true `;
+                    content += `if (x >= ${Strips.x[i][0]} && x <= ${Strips.x[i][1]} && y == ${Strips.y[i]} ) flag = true; `;
                 } else if (!Array.isArray(Strips.x[i]) && Array.isArray(Strips.y[i])) {
-                    content += `if ( x == ${Strips.x[i]} && y >= ${Strips.y[i][0]} && y <= ${Strips.y[i][1]} ) flag = true `;
+                    content += `if ( x == ${Strips.x[i]} && y >= ${Strips.y[i][0]} && y <= ${Strips.y[i][1]} ) flag = true; `;
                 } else {
-                    content += `if ( x == ${Strips.x[i]} && y == ${Strips.y[i]} ) flag = true `;
+                    content += `if ( x == ${Strips.x[i]} && y == ${Strips.y[i]} ) flag = true; `;
                 }
             }
             var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
